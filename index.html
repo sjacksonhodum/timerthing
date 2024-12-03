@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sam's Really Cool Christmas Countdown Timer 🎄</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Christmas Countdown Timer 🎄</h1>
+    <p>Track your school week, general week, and break progress</p>
+
+    <form id="date-form">
+      <label for="start-date">Start Date (default Dec 2):</label>
+      <input type="date" id="start-date" name="start-date" value="2024-12-02">
+      
+      <label for="end-date">End Date (default Dec 20):</label>
+      <input type="date" id="end-date" name="end-date" value="2024-12-20">
+      
+      <button type="submit">Set Dates</button>
+    </form>
+
+    <div id="remaining-time">
+      <h2>Remaining Time</h2>
+      <div class="time-category">
+        <label>School Week (Until Friday):</label>
+        <progress id="school-progress" max="100" value="0"></progress>
+        <p id="school-time"></p>
+      </div>
+      <div class="time-category">
+        <label>Week (Until Sunday):</label>
+        <progress id="week-progress" max="100" value="0"></progress>
+        <p id="week-time"></p>
+      </div>
+      <div class="time-category">
+        <label>Break:</label>
+        <progress id="break-progress" max="100" value="0"></progress>
+        <p id="break-time"></p>
+      </div>
+    </div>
+
+    <div id="completed-time">
+      <h2>Completed Time</h2>
+      <div class="time-category">
+        <label>School Week (Completed):</label>
+        <progress id="school-progress-completed" max="100" value="0"></progress>
+        <p id="school-time-completed"></p>
+      </div>
+      <div class="time-category">
+        <label>Week (Completed):</label>
+        <progress id="week-progress-completed" max="100" value="0"></progress>
+        <p id="week-time-completed"></p>
+      </div>
+      <div class="time-category">
+        <label>Break (Completed):</label>
+        <progress id="break-progress-completed" max="100" value="0"></progress>
+        <p id="break-time-completed"></p>
+      </div>
+    </div>
+
+    <p id="footer">"Made by a kid who hates school - Samuel Jackson-Hodum"</p>
+    <p id="footer">🤓written from scratch using vscode and github pages🤓</p>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
