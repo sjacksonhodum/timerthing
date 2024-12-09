@@ -1,73 +1,86 @@
-// Function to calculate the progress of a given time period
-function calculateProgress(startDate, endDate) {
-  const currentDate = new Date();
-  const totalTime = endDate - startDate;
-  const elapsedTime = currentDate - startDate;
-  const remainingTime = endDate - currentDate;
+document.addEventListener("DOMContentLoaded", () => {
+    const remainingSchoolWeekEl = document.getElementById("remaining-school-week");
+    const remainingWeekEl = document.getElementById("remaining-week");
+    const remainingBreakEl = document.getElementById("remaining-break");
+    const completedSchoolWeekEl = document.getElementById("completed-school-week");
+    const completedWeekEl = document.getElementById("completed-week");
+    const completedBreakEl = document.getElementById("completed-break");
 
-  const progress = (elapsedTime / totalTime) * 100;
-  const remainingProgress = (remainingTime / totalTime) * 100;
+    const startDate = new Date("2024-12-02");
+    const endDate = new Date("2024-12-20");
 
-  return { progress, remainingProgress, elapsedTime, remainingTime };
-}
+    function updateTimer() {
+        const now = new Date();
 
-// Function to format the time in days, hours, minutes, and seconds
-function formatTime(ms) {
-  const days = Math.floor(ms / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((ms % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
-  const seconds = Math.floor((ms % (1000 * 60)) / 1000);
-  return `${days}d ${hours}h ${minutes}m ${seconds}s`;
-}
+        // Get start and end of school week (Monday to Friday)
+        const currentDay = now.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+        const schoolWeekStart = new Date(now);
+        schoolWeekStart.setDate(now.getDate() - ((currentDay + 6) % 7)); // Previous Monday
+        schoolWeekStart.setHours(0, 0, 0, 0);
+        const schoolWeekEnd = new Date(schoolWeekStart);
+        schoolWeekEnd.setDate(schoolWeekStart.getDate() + 4); // Friday
+        schoolWeekEnd.setHours(23, 59, 59, 999);
 
-function updateProgress() {
-  const startDate = new Date(document.getElementById('start-date').value);
-  const endDate = new Date(document.getElementById('end-date').value);
+        // Get start and end of the calendar week (Sunday to Saturday)
+        const weekStart = new Date(now);
+        weekStart.setDate(now.getDate() - currentDay); // Previous Sunday
+        weekStart.setHours(0, 0, 0, 0);
+        const weekEnd = new Date(weekStart);
+        weekEnd.setDate(weekStart.getDate() + 6); // Saturday
+        weekEnd.setHours(23, 59, 59, 999);
 
-  // Calculate remaining time for School Week, Week, and Break
-  const schoolEndDate = new Date(startDate);
-  schoolEndDate.setDate(startDate.getDate() + (5 - startDate.getDay())); // Friday
+        // Calculate remaining and completed time for each period
+        const schoolWeekRemaining = Math.max(schoolWeekEnd - now, 0);
+        const weekRemaining = Math.max(weekEnd - now, 0);
+        const breakRemaining = Math.max(endDate - now, 0);
 
-  const weekEndDate = new Date(startDate);
-  weekEndDate.setDate(startDate.getDate() + (7 - startDate.getDay())); // Sunday
+        const schoolWeekCompleted = Math.max(now - schoolWeekStart, 0);
+        const weekCompleted = Math.max(now - weekStart, 0);
+        const breakCompleted = Math.max(now - startDate, 0);
 
-  // Break period (from start to end date)
-  const breakStartDate = new Date(startDate);
-  const breakEndDate = new Date(endDate);
+        // Format time as days, hours, minutes, and seconds
+        function formatTime(ms) {
+            const days = Math.floor(ms / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((ms % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((ms % (1000 * 60)) / 1000);
+            return `${days}d ${hours}h ${minutes}m ${seconds}s`;
+        }
 
-  const schoolProgress = calculateProgress(startDate, schoolEndDate);
-  const weekProgress = calculateProgress(startDate, weekEndDate);
-  const breakProgress = calculateProgress(breakStartDate, breakEndDate);
+        // Update remaining time
+        remainingSchoolWeekEl.textContent = formatTime(schoolWeekRemaining);
+        remainingWeekEl.textContent = formatTime(weekRemaining);
+        remainingBreakEl.textContent = formatTime(breakRemaining);
 
-  // Update progress bars for remaining time
-  document.getElementById('school-progress').value = schoolProgress.remainingProgress;
-  document.getElementById('week-progress').value = weekProgress.remainingProgress;
-  document.getElementById('break-progress').value = breakProgress.remainingProgress;
+        // Update completed time
+        completedSchoolWeekEl.textContent = formatTime(schoolWeekCompleted);
+        completedWeekEl.textContent = formatTime(weekCompleted);
+        completedBreakEl.textContent = formatTime(breakCompleted);
 
-  // Update progress bars for completed time
-  document.getElementById('school-progress-completed').value = schoolProgress.progress;
-  document.getElementById('week-progress-completed').value = weekProgress.progress;
-  document.getElementById('break-progress-completed').value = breakProgress.progress;
+        // Update progress bars
+        function updateProgressBar(el, completed, total) {
+            const percentage = Math.min((completed / total) * 100, 100);
+            el.style.width = `${percentage}%`;
+        }
 
-  // Update the text for remaining time
-  document.getElementById('school-time').textContent = `Time Remaining: ${formatTime(schoolProgress.remainingTime)}`;
-  document.getElementById('week-time').textContent = `Time Remaining: ${formatTime(weekProgress.remainingTime)}`;
-  document.getElementById('break-time').textContent = `Time Remaining: ${formatTime(breakProgress.remainingTime)}`;
+        updateProgressBar(
+            document.querySelector("#remaining-school-week + .progress-bar"),
+            schoolWeekCompleted,
+            schoolWeekCompleted + schoolWeekRemaining
+        );
+        updateProgressBar(
+            document.querySelector("#remaining-week + .progress-bar"),
+            weekCompleted,
+            weekCompleted + weekRemaining
+        );
+        updateProgressBar(
+            document.querySelector("#remaining-break + .progress-bar"),
+            breakCompleted,
+            breakCompleted + breakRemaining
+        );
+    }
 
-  // Update the text for completed time
-  document.getElementById('school-time-completed').textContent = `Time Completed: ${formatTime(schoolProgress.elapsedTime)}`;
-  document.getElementById('week-time-completed').textContent = `Time Completed: ${formatTime(weekProgress.elapsedTime)}`;
-  document.getElementById('break-time-completed').textContent = `Time Completed: ${formatTime(breakProgress.elapsedTime)}`;
-}
-
-// Update progress every second
-setInterval(updateProgress, 1000);
-
-// Initial update
-updateProgress();
-
-// Form submission handling
-document.getElementById('date-form').addEventListener('submit', function(e) {
-  e.preventDefault();
-  updateProgress();
+    // Update the timer every second
+    updateTimer();
+    setInterval(updateTimer, 1000);
 });
